@@ -23,7 +23,10 @@ async def query_llm(user_message: str, system_data: dict = None):
         
     if "get_process_list" in system_data:
         procs = system_data["get_process_list"]
+        print(procs)
         top_cpu = procs.get('top_cpu_processes', [])[0]
+        print("==========================================")
+        print(top_cpu)
         if top_cpu:
             summary_lines.append(f"- Top CPU consumer: {top_cpu['name']} ({top_cpu['cpu_percent']}%)")
             

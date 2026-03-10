@@ -30,3 +30,5 @@ build/
 *.coverage
 .coverage.*
 .cache
+*.pyc
+backend/collectors/__pycache__/

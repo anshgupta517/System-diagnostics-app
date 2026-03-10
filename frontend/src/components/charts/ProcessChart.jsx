@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, ResponsiveContainer, Tooltip, Cell, LabelList } from 'recharts';
 
 const ProcessChart = ({ processData }) => {
     if (!processData) return null;
@@ -59,7 +59,7 @@ const ProcessChart = ({ processData }) => {
                     <BarChart
                         data={formatData}
                         layout="vertical"
-                        margin={{ top: 0, right: 10, left: 0, bottom: 0 }}
+                        margin={{ top: 0, right: 35, left: 0, bottom: 0 }}
                     >
                         <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#3f3f46" vertical={false} />
                         <XAxis type="number" hide />
@@ -76,6 +76,12 @@ const ProcessChart = ({ processData }) => {
                              {formatData.map((entry, index) => (
                                 <Cell key={`cell-${index}`} fill={view === 'cpu' ? '#3b82f6' : '#a855f7'} /> // blue-500 or purple-500
                             ))}
+                            <LabelList 
+                                dataKey="value" 
+                                position="right" 
+                                formatter={(val) => `${val.toFixed(1)}%`}
+                                style={{ fill: '#d4d4d8', fontSize: 10 }} // zinc-300
+                            />
                         </Bar>
                     </BarChart>
                 </ResponsiveContainer>
