@@ -16,14 +16,16 @@ def get_process_list(limit=5):
             pass
 
     # Give it a tiny moment to measure (0.1s is enough for a quick read)
-    time.sleep(0.1)
+    time.sleep(1)
 
     proc_data = []
     for p in procs:
         try:
             info = p.info
-            # Second call gets the actual delta
-            info['cpu_percent'] = p.cpu_percent(interval=None) 
+            # Second call gets the actual delta, divided by core count for accurate % out of 100
+            cpu_val = p.cpu_percent(interval=None)
+            core_count = psutil.cpu_count() or 1
+            info['cpu_percent'] = cpu_val / core_count
             proc_data.append(info)
         except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
             pass
