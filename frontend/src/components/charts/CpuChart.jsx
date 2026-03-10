@@ -20,7 +20,7 @@ const CpuChart = ({ cpuData }) => {
     }];
 
     return (
-        <div className="w-full h-48 flex flex-col items-center justify-center bg-zinc-900 rounded-xl p-4 border border-zinc-800">
+        <div className="w-full h-55 flex flex-col items-center justify-center bg-zinc-900 rounded-xl p-4 border border-zinc-800">
             <h3 className="text-zinc-400 text-sm font-semibold mb-2 w-full text-left">CPU Usage</h3>
             <div className="flex-1 w-full relative">
                 <ResponsiveContainer width="100%" height="100%">
