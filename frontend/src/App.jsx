@@ -38,7 +38,11 @@ function App() {
 
     try {
       const response = await sendMessage(text);
-      const aiMsg = { role: 'assistant', content: response.response };
+      const aiMsg = { 
+        role: 'assistant', 
+        content: response.response,
+        data: response.data_collected
+      };
       setMessages(prev => [...prev, aiMsg]);
     } catch (error) {
       setMessages(prev => [...prev, { role: 'assistant', content: "Sorry, I couldn't reach the system agent. Is the backend running?" }]);
@@ -77,7 +81,7 @@ function App() {
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-4 scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
           {messages.map((msg, idx) => (
-            <MessageBubble key={idx} role={msg.role} content={msg.content} />
+            <MessageBubble key={idx} role={msg.role} content={msg.content} data={msg.data} />
           ))}
           {loading && (
             <div className="flex justify-start animate-pulse">

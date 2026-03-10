@@ -1,6 +1,7 @@
 import React from 'react';
+import DataVisualizer from './DataVisualizer';
 
-const MessageBubble = ({ role, content }) => {
+const MessageBubble = ({ role, content, data }) => {
     const isUser = role === 'user';
 
     return (
@@ -12,6 +13,7 @@ const MessageBubble = ({ role, content }) => {
                     }`}
             >
                 <p className="whitespace-pre-wrap leading-relaxed">{content}</p>
+                {!isUser && data && <DataVisualizer data={data} />}
             </div>
         </div>
     );
