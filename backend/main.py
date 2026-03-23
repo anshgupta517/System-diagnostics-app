@@ -4,6 +4,9 @@ from pydantic import BaseModel
 import uvicorn
 import tool_router
 import llm_service
+from dotenv import load_dotenv
+
+load_dotenv()
 
 app = FastAPI(title="AI System Summarizer")
 

@@ -1,73 +1,64 @@
+import os
 import json
+from google import genai
+from google.genai import types
+
+def scrub_sensitive_data(system_data: dict) -> dict:
+    """Removes sensitive information like usernames from the system stats payload."""
+    if not system_data:
+        return system_data
+    
+    # Deep copy using JSON to avoid modifying the original data referencing mutable dicts
+    scrubbed = json.loads(json.dumps(system_data))
+    
+    if "get_process_list" in scrubbed:
+        for key in ["top_cpu_processes", "top_memory_processes"]:
+            if key in scrubbed["get_process_list"]:
+                for proc in scrubbed["get_process_list"][key]:
+                    if "username" in proc:
+                        # Scrub the username to ensure privacy
+                        proc["username"] = "REDACTED"
+                        
+    return scrubbed
 
 async def query_llm(user_message: str, system_data: dict = None):
     """
-    Simulates an LLM response. 
-    In the future, this will call OpenAI/Anthropic/Local LLM.
+    Calls the Google Gemini API to analyze the system data and answer the user's query.
     """
-    
+    api_key = os.environ.get("GEMINI_API_KEY")
+    if not api_key or api_key == "your_api_key_here":
+        return "Error: Gemini API key is not configured. Please set GEMINI_API_KEY in your .env file."
+        
     if not system_data:
-        # Phase 1: Simple keyword matching to simulate "thinking" or "checking"
-        return "I need to check your system stats to answer that. (This is a mock response, data not collected yet)"
+        return "I need to check your system stats to answer that. Let me get that data first."
 
-    # If we have data, we summarize it (Mocking the summary)
-    summary_lines = ["Here is what I found on your system:"]
+    # 1. Scrub sensitive data
+    scrubbed_data = scrub_sensitive_data(system_data)
     
-    if "get_cpu_stats" in system_data:
-        cpu = system_data["get_cpu_stats"]
-        summary_lines.append(f"- CPU Usage is at {cpu.get('total_cpu_usage')}.")
-        
-    if "get_memory_stats" in system_data:
-        mem = system_data["get_memory_stats"]
-        summary_lines.append(f"- RAM Usage: {mem.get('ram_percent')} ({mem.get('ram_used')} used of {mem.get('ram_total')}).")
-        
-    if "get_process_list" in system_data:
-        procs = system_data["get_process_list"]
-        print(procs)
-        top_cpu = procs.get('top_cpu_processes', [])[0]
-        print("==========================================")
-        print(top_cpu)
-        if top_cpu:
-            summary_lines.append(f"- Top CPU consumer: {top_cpu['name']} ({top_cpu['cpu_percent']:.1f}%)")
-            
-    summary_lines.append("\nBased on this, everything looks " + ("normal." if "8" not in str(system_data) else "a bit high."))
-
-    # Generate suggestions for resource management
-    suggestion_lines = []
-    if "get_process_list" in system_data and "get_memory_stats" in system_data and "get_cpu_stats" in system_data:
-        try:
-            cpu_val = float(system_data["get_cpu_stats"].get('total_cpu_usage', '0').replace('%', ''))
-            mem_val = float(system_data["get_memory_stats"].get('ram_percent', '0').replace('%', ''))
-            
-            procs = system_data["get_process_list"]
-            top_cpu = procs.get('top_cpu_processes', [])[0] if procs.get('top_cpu_processes') else None
-            top_mem = procs.get('top_memory_processes', [])[0] if procs.get('top_memory_processes') else None
-
-            needs_suggestion = False
-            if "spike" in user_message.lower() or "why" in user_message.lower() or "suggestion" in user_message.lower():
-                needs_suggestion = True
-            elif cpu_val > 70 or mem_val > 70:
-                needs_suggestion = True
-                
-            if needs_suggestion:
-                suggestion_lines.append("\n💡 **Suggestion on managing your resources:**")
-                added_specific_suggestion = False
-                
-                if cpu_val > 50 and top_cpu:
-                    suggestion_lines.append(f"- Your CPU usage is elevated. You should check the '{top_cpu['name']}' process (PID: {top_cpu['pid']}) because it is using {top_cpu['cpu_percent']:.1f}% of your CPU.")
-                    added_specific_suggestion = True
-                    
-                if mem_val > 60 and top_mem:
-                    suggestion_lines.append(f"- Your RAM usage is high. The '{top_mem['name']}' process (PID: {top_mem['pid']}) is currently consuming {top_mem['memory_percent']:.1f}% of your memory. Consider closing it if it's not needed.")
-                    added_specific_suggestion = True
-                
-                if not added_specific_suggestion and top_cpu and top_mem:
-                    suggestion_lines.append(f"- While your overall metrics aren't critically high, the heaviest applications right now are '{top_cpu['name']}' on CPU and '{top_mem['name']}' on RAM. Keeping fewer background apps open helps manage resources.")
-
-            if suggestion_lines:
-                summary_lines.extend(suggestion_lines)
-        except Exception as e:
-            # Silently fail suggestion logic if parsing fails
-            pass
-            
-    return "\n".join(summary_lines)
+    # 2. Prepare prompt
+    system_instruction = (
+        "You are an expert AI system diagnostic assistant. "
+        "You help users understand their computer's performance using real-time metrics. "
+        "Analyze the provided JSON system data and answer the user's query. "
+        "Keep your answer concise, helpful, and formatted with markdown. "
+        "If a process is consuming too much CPU or RAM, point it out including its PID. "
+        "Do not invent data; only rely on the JSON provided. "
+        "Do not mention usernames or sensitive paths, as they have been redacted."
+    )
+    
+    prompt = f"System Data:\n```json\n{json.dumps(scrubbed_data, indent=2)}\n```\n\nUser Query: {user_message}"
+    
+    # 3. Call Gemini API
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                system_instruction=system_instruction,
+                temperature=0.3
+            )
+        )
+        return response.text
+    except Exception as e:
+        return f"Sorry, I encountered an error while calling the AI model: {str(e)}"
