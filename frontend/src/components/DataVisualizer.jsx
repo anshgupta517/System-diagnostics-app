@@ -2,13 +2,14 @@ import React from 'react';
 import CpuChart from './charts/CpuChart';
 import MemoryChart from './charts/MemoryChart';
 import ProcessChart from './charts/ProcessChart';
+import DiskChart from './charts/DiskChart';
 
 const DataVisualizer = ({ data }) => {
     if (!data) return null;
 
     return (
         <div className="mt-4 flex flex-col gap-4 w-full">
-            <div className="flex flex-col sm:flex-row gap-4 w-full justify-between">
+            <div className="flex flex-col sm:flex-row gap-4 w-full justify-between flex-wrap">
                 {data.get_cpu_stats && (
                     <div className="flex-1 min-w-[200px]">
                          <CpuChart cpuData={data.get_cpu_stats} />
@@ -18,6 +19,12 @@ const DataVisualizer = ({ data }) => {
                 {data.get_memory_stats && (
                     <div className="flex-1 min-w-[200px]">
                          <MemoryChart memoryData={data.get_memory_stats} />
+                    </div>
+                )}
+                
+                {data.get_disk_stats && (
+                    <div className="flex-1 min-w-[200px]">
+                         <DiskChart diskData={data.get_disk_stats} />
                     </div>
                 )}
             </div>

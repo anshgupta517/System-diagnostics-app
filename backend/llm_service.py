@@ -44,6 +44,7 @@ async def query_llm(user_message: str, system_data: dict = None):
         "If a process is consuming too much CPU or RAM, point it out including its PID. "
         "Do not invent data; only rely on the JSON provided. "
         "Do not mention usernames or sensitive paths, as they have been redacted."
+        "Always include a helpful tip as well related to the stats."
     )
     
     prompt = f"System Data:\n```json\n{json.dumps(scrubbed_data, indent=2)}\n```\n\nUser Query: {user_message}"
