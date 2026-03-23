@@ -47,6 +47,7 @@ async def query_llm(user_message: str, system_data: dict = None):
         "2. Do not invent data; rely strictly on the provided JSON payload. "
         "3. Usernames and sensitive paths have been REDACTED for privacy. "
         "4. Always conclude with an actionable, helpful tip genuinely related to their actual current metrics or their specific query."
+        "5. If data is unavailable, say so and do not make up data and just explain the situation."
     )
     
     prompt = f"System Data:\n```json\n{json.dumps(scrubbed_data, indent=2)}\n```\n\nUser Query: {user_message}"
