@@ -34,7 +34,7 @@ const NetworkChart = ({ networkData }) => {
             
             {/* Cumulative Tags */}
             <div className="mt-auto flex flex-col gap-2">
-                <div className="grid grid-cols-3 gap-2 text-xs">
+                <div className="grid grid-cols-3 gap-2 text-l">
                     <div className="bg-zinc-950/50 rounded-md p-2 border border-zinc-800/50 flex flex-col items-center justify-center">
                         <span className="text-zinc-500 text-[9px] uppercase font-semibold">Ping</span>
                         <span className="text-zinc-300 font-bold">{networkData.ping || "0 ms"}</span>
@@ -49,9 +49,9 @@ const NetworkChart = ({ networkData }) => {
                     </div>
                 </div>
                 
-                <div className="flex justify-between w-full text-[10px] text-zinc-600 px-1 mt-1">
-                     <span>Pkts In: {networkData.packets_recv?.toLocaleString()}</span>
-                     <span>Pkts Out: {networkData.packets_sent?.toLocaleString()}</span>
+                <div className="flex justify-between w-full text-[15px] text-zinc-300 font-bold px-1 mt-1">
+                     <span>Packets In: {networkData.packets_recv?.toLocaleString()}</span>
+                     <span>Packets Out: {networkData.packets_sent?.toLocaleString()}</span>
                 </div>
             </div>
         </div>
