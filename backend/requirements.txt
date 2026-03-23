@@ -4,3 +4,4 @@ psutil
 httpx
 python-dotenv
 google-genai
+speedtest-cli

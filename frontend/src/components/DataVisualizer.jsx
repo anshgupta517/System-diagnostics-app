@@ -3,6 +3,7 @@ import CpuChart from './charts/CpuChart';
 import MemoryChart from './charts/MemoryChart';
 import ProcessChart from './charts/ProcessChart';
 import DiskChart from './charts/DiskChart';
+import NetworkChart from './charts/NetworkChart';
 
 const DataVisualizer = ({ data }) => {
     if (!data) return null;
@@ -25,6 +26,12 @@ const DataVisualizer = ({ data }) => {
                 {data.get_disk_stats && (
                     <div className="flex-1 min-w-[200px]">
                          <DiskChart diskData={data.get_disk_stats} />
+                    </div>
+                )}
+                
+                {data.get_network_stats && (
+                    <div className="flex-1 min-w-[200px]">
+                         <NetworkChart networkData={data.get_network_stats} />
                     </div>
                 )}
             </div>

@@ -2,12 +2,14 @@ from collectors.cpu import get_cpu_stats
 from collectors.memory import get_memory_stats
 from collectors.process import get_process_list
 from collectors.disk import get_disk_stats
+from collectors.network import get_network_stats
 
 AVAILABLE_TOOLS = {
     "get_cpu_stats": get_cpu_stats,
     "get_memory_stats": get_memory_stats,
     "get_process_list": get_process_list,
-    "get_disk_stats": get_disk_stats
+    "get_disk_stats": get_disk_stats,
+    "get_network_stats": get_network_stats
 }
 
 def router_tool_calls(intent: str):
@@ -31,6 +33,8 @@ def router_tool_calls(intent: str):
         tool_names.append("get_memory_stats")
     if "disk" in intent.lower() or "storage" in intent.lower() or "space" in intent.lower():
         tool_names.append("get_disk_stats")
+    if "network" in intent.lower() or "internet" in intent.lower() or "wifi" in intent.lower() or "connection" in intent.lower() or "bandwidth" in intent.lower():
+        tool_names.append("get_network_stats")
     if "process" in intent.lower() or "slow" in intent.lower() or "spike" in intent.lower() or "why" in intent.lower() or "suggestion" in intent.lower(): 
         tool_names.append("get_process_list")
         if "cpu" not in intent.lower(): tool_names.append("get_cpu_stats") 
